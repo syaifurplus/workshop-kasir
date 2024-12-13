@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('payment_id')->constrained();
+            $table->integer('total')->default(0);
+            $table->longText('note')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
