@@ -15,4 +15,9 @@ class Order extends Model
         'total',
         'note'
     ];
+
+    public function orderDetail(): HasMany
+    {
+        return $this->HasMany(OrderDetail::class);
+    }
 }
