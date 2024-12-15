@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
@@ -17,6 +18,10 @@ class Category extends Model
         'status'
     ];
 
+    public function product(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
     public static function generateUniqueSlug(String $name): String
     {
         $slug = Str::slug($name);
