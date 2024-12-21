@@ -133,10 +133,12 @@ class OrderResource extends Resource
                         $product = Product::find($state);
                         $set('unit_price', $product->price ?? 0);
                         $set('stock', $product->stock ?? 0);
-                    }),
+                    })
+                    ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
                  Forms\Components\TextInput::make('quantity')
                     ->required()
                     ->numeric()
+                    ->default(1)
                     ->minValue(1)
                     ->columnSpan([
                         'md' => 2,
