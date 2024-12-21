@@ -146,4 +146,16 @@ class OrderResource extends Resource
                     ]),
                 ]);
     }
+
+    public static function updateTotalPrice(Forms\get $get, Forms\set $set): void
+    {
+        $selectedProducts = collect($get('orderProducts'))->filter(fn($item) => !empty($item['product_id']) && !empty($item['quantity']));
+
+        $prices = $selectedProducts->map(fn($item) => $item['unit_price'] * $item['quantity']);
+        $total = $selectedProducts->reduce(function ($total, $product) use ($prices) {
+            return $total + $prices->sum();
+        }, 0);
+
+        $set('total', $total);
+    }
 }
