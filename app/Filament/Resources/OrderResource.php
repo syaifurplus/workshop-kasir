@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -41,6 +42,21 @@ class OrderResource extends Resource
                             Forms\Components\Select::make('user_id')
                                 ->label('Pilih Pelanggan')
                                 ->relationship('user', 'name')
+                                ->searchable()
+                                ->createOptionForm([
+                                    Forms\Components\TextInput::make('name')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('email')
+                                        ->required()
+                                        ->email(),
+                                ])
+                                ->createOptionUsing(function (array $data) {
+                                    return User::create([
+                                        'name' => $data['name'],
+                                        'email' => $data['email'],
+                                        'password' => bcrypt('password'), // Atur password default
+                                    ])->id;
+                                })
                                 ->required(),
                             Forms\Components\Select::make('payment_id')
                                 ->relationship('payment', 'name')
