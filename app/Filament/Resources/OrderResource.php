@@ -113,6 +113,7 @@ class OrderResource extends Resource
     public static function getOrderRepeater(): Repeater
     {
         return Repeater::make('orderProducts')
+            ->live()
             ->columns([
                 'md' => 12,
             ])
@@ -123,7 +124,12 @@ class OrderResource extends Resource
                     ->options(Product::query()->where('stock', '>', 1)->pluck('name', 'id'))
                     ->columnSpan([
                         'md' => 5,
-                    ]),
+                    ])
+                    ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                        $product = Product::find($state);
+                        $set('unit_price', $product->price ?? 0);
+                        $set('stock', $product->stock ?? 0);
+                    }),
                  Forms\Components\TextInput::make('quantity')
                     ->required()
                     ->numeric()
@@ -147,7 +153,7 @@ class OrderResource extends Resource
                 ]);
     }
 
-    public static function updateTotalPrice(Forms\get $get, Forms\set $set): void
+    public static function updateTotalPrice(Forms\Get $get, Forms\Set $set): void
     {
         $selectedProducts = collect($get('orderProducts'))->filter(fn($item) => !empty($item['product_id']) && !empty($item['quantity']));
 
