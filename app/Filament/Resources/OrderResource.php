@@ -114,7 +114,7 @@ class OrderResource extends Resource
     {
         return Repeater::make('orderProducts')
             ->columns([
-                'md' => 10,
+                'md' => 12,
             ])
             ->schema([
                  Forms\Components\Select::make('product_id')
@@ -128,21 +128,21 @@ class OrderResource extends Resource
                     ->required()
                     ->numeric()
                     ->columnSpan([
-                        'md' => 1,
+                        'md' => 2,
                     ]),
                  Forms\Components\TextInput::make('stock')
                     ->required()
                     ->numeric()
                     ->disabled()
                     ->columnSpan([
-                        'md' => 1,
+                        'md' => 2,
                     ]),
                 Forms\Components\TextInput::make('unit_price')
                     ->required()
                     ->numeric()
                     ->readOnly()
                     ->columnSpan([
-                        'md' => 2,
+                        'md' => 3,
                     ]),
                 ]);
     }
