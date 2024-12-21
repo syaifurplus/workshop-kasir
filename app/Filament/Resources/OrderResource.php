@@ -23,18 +23,32 @@ class OrderResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->required(),
-                Forms\Components\Select::make('payment_id')
-                    ->relationship('payment', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('total')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\Textarea::make('note')
-                    ->columnSpanFull(),
+                // Forms\Components\Repeater::make('products')
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Buat Order')
+                        ->schema([
+                            Forms\Components\Select::make('payment_id')
+                                ->relationship('payment', 'name')
+                                ->required(),
+                            Forms\Components\TextInput::make('total')
+                                ->required()
+                                ->numeric()
+                                ->default(0),
+                            Forms\Components\Textarea::make('note')
+                                ->columnSpanFull(),
+                        ])
+                    ]),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Informasi Utama')
+                        ->schema([
+                            Forms\Components\Select::make('user_id')
+                                ->label('Pilih Pelanggan')
+                                ->relationship('user', 'name')
+                                ->required(),
+                        ])
+                    ]),
             ]);
     }
 
