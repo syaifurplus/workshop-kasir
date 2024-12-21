@@ -130,10 +130,19 @@ class OrderResource extends Resource
                     ->columnSpan([
                         'md' => 5,
                     ])
+                    ->afterStateHydrated(function ($state, Forms\Get $get, Forms\Set $set) {
+                        $product = Product::find($state);
+                        $set('price', $product->price ?? 0);
+                        $set('stock', $product->stock ?? 0);
+                    })
                     ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
                         $product = Product::find($state);
                         $set('price', $product->price ?? 0);
                         $set('stock', $product->stock ?? 0);
+                        $quantity = $get('quantity') ?? 1;
+                        $stock = $get('stock');
+
+                        self::updateTotalPrice($get, $set);
                     })
                     ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
                  Forms\Components\TextInput::make('quantity')
