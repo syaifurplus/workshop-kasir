@@ -113,7 +113,8 @@ class OrderResource extends Resource
 
     public static function getOrderRepeater(): Repeater
     {
-        return Repeater::make('orderProducts')
+        return Repeater::make('orderDetail')
+            ->relationship()
             ->live()
             ->columns([
                 'md' => 12,
@@ -131,7 +132,7 @@ class OrderResource extends Resource
                     ])
                     ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
                         $product = Product::find($state);
-                        $set('unit_price', $product->price ?? 0);
+                        $set('price', $product->price ?? 0);
                         $set('stock', $product->stock ?? 0);
                     })
                     ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
@@ -162,7 +163,7 @@ class OrderResource extends Resource
                     ->columnSpan([
                         'md' => 2,
                     ]),
-                Forms\Components\TextInput::make('unit_price')
+                Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
                     ->readOnly()
@@ -174,7 +175,7 @@ class OrderResource extends Resource
 
     public static function updateTotalPrice(Forms\Get $get, Forms\Set $set): void
     {
-        $selectedProducts = collect($get('orderProducts'))->filter(fn($item) => !empty($item['product_id']) && !empty($item['quantity']));
+        $selectedProducts = collect($get('orderDetail'))->filter(fn($item) => !empty($item['product_id']) && !empty($item['quantity']));
 
         $prices = Product::find($selectedProducts->pluck('product_id'))->pluck('price', 'id');
         $total = $selectedProducts->reduce(function ($total, $product) use ($prices) {
