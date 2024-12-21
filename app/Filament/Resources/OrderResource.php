@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
-use App\Models\Order;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Order;
+use App\Models\Product;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\OrderResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\OrderResource\RelationManagers;
 
 class OrderResource extends Resource
 {
@@ -28,15 +30,7 @@ class OrderResource extends Resource
                     ->schema([
                         Forms\Components\Section::make('Buat Order')
                         ->schema([
-                            Forms\Components\Select::make('payment_id')
-                                ->relationship('payment', 'name')
-                                ->required(),
-                            Forms\Components\TextInput::make('total')
-                                ->required()
-                                ->numeric()
-                                ->default(0),
-                            Forms\Components\Textarea::make('note')
-                                ->columnSpanFull(),
+                            self::getOrderRepeater(),
                         ])
                     ]),
                 Forms\Components\Group::make()
@@ -47,6 +41,15 @@ class OrderResource extends Resource
                                 ->label('Pilih Pelanggan')
                                 ->relationship('user', 'name')
                                 ->required(),
+                            Forms\Components\Select::make('payment_id')
+                                ->relationship('payment', 'name')
+                                ->required(),
+                            Forms\Components\TextInput::make('total')
+                                ->required()
+                                ->numeric()
+                                ->default(0),
+                            Forms\Components\Textarea::make('note')
+                                ->columnSpanFull(),
                         ])
                     ]),
             ]);
@@ -105,5 +108,42 @@ class OrderResource extends Resource
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
         ];
+    }
+
+    public static function getOrderRepeater(): Repeater
+    {
+        return Repeater::make('orderProducts')
+            ->columns([
+                'md' => 10,
+            ])
+            ->schema([
+                 Forms\Components\Select::make('product_id')
+                    ->label('Produk')
+                    ->required()
+                    ->options(Product::query()->where('stock', '>', 1)->pluck('name', 'id'))
+                    ->columnSpan([
+                        'md' => 5,
+                    ]),
+                 Forms\Components\TextInput::make('quantity')
+                    ->required()
+                    ->numeric()
+                    ->columnSpan([
+                        'md' => 1,
+                    ]),
+                 Forms\Components\TextInput::make('stock')
+                    ->required()
+                    ->numeric()
+                    ->disabled()
+                    ->columnSpan([
+                        'md' => 1,
+                    ]),
+                Forms\Components\TextInput::make('unit_price')
+                    ->required()
+                    ->numeric()
+                    ->readOnly()
+                    ->columnSpan([
+                        'md' => 2,
+                    ]),
+                ]);
     }
 }
